@@ -1,0 +1,28 @@
+[project]
+name = "human-in-the-loop"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Tomperez98", email = "tomasperezalvarez@gmail.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi[standard]>=0.115.7",
+    "resonate-sdk>=0.4.7",
+    "typer>=0.15.1",
+]
+
+[project.scripts]
+human-in-the-loop = "human_in_the_loop.cli:main"
+auth-service = "human_in_the_loop.auth_service:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.14.1",
+    "ruff>=0.9.3",
+]
