@@ -1,4 +1,4 @@
-from typing import Any, Callable, Generator
+from typing import Any, Generator
 from resonate import DurablePromise, Promise, Resonate, Context
 from resonate.task_sources import Poller
 from typer import Typer
@@ -28,7 +28,7 @@ def send_email(ctx: Context, promise_id: str, email: str) -> None:
     """)
 
 
-@resonate.register
+@resonate.register()
 def auth_handler(ctx: Context, email: str) -> Generator[Yieldable, Any, str]:
     promise: Promise[Any] = yield ctx.rfi(DurablePromise())
     yield ctx.lfc(send_email, promise.id, email)
@@ -37,6 +37,7 @@ def auth_handler(ctx: Context, email: str) -> Generator[Yieldable, Any, str]:
         return "You are authorize!"
 
     return "Not authorized :("
+
 
 @app.command()
 def auth(email: str) -> None:
@@ -47,7 +48,6 @@ def auth(email: str) -> None:
 @app.command()
 def hello(name: str):
     print(f"Hello {name}")
-
 
 
 def main() -> None:

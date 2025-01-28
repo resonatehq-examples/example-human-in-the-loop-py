@@ -10,6 +10,7 @@ app = FastAPI()
 
 # Define a sample route
 
+
 @app.get("/")
 def read_root(promise_id: str, value: bool):
     resonate_store.promises.resolve(

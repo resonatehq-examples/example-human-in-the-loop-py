@@ -306,7 +306,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = ">=0.115.7" },
-    { name = "resonate-sdk", specifier = ">=0.4.7" },
+    { name = "resonate-sdk", specifier = ">=0.4.8" },
     { name = "typer", specifier = ">=0.15.1" },
 ]
 
@@ -748,7 +748,7 @@ wheels = [
 
 [[package]]
 name = "resonate-sdk"
-version = "0.4.7"
+version = "0.4.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "opentelemetry-api" },
@@ -757,9 +757,9 @@ dependencies = [
     { name = "requests" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/35/f2/075a65d53c4e4501e27379a7c1dfcb031d1dfdc203b052fb90b9afe434a5/resonate_sdk-0.4.7.tar.gz", hash = "sha256:2637d8fb6c4d9d1bcdfabdafff8b47165251834258fe85c49c52e69d6b97b66a", size = 44774 }
+sdist = { url = "https://files.pythonhosted.org/packages/6b/4f/7fd0edd4c9698a6c28577799875818fe6bc672d5284ab35e0deedca41205/resonate_sdk-0.4.8.tar.gz", hash = "sha256:5db16db6757d4cc03e489e61d4319cd2d19d6617fbcedc3a5960f73f4be4c462", size = 44918 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6d/b1/319d79553202a3b699c8be9a9f1321c0494d7c5a57398de61bab8adf3364/resonate_sdk-0.4.7-py3-none-any.whl", hash = "sha256:6e35f8906ebafd80410a305abd32180d4bdc13598463999109af464d53670dd2", size = 42211 },
+    { url = "https://files.pythonhosted.org/packages/3c/94/e1759c0a8828d8ecb1dd693b87f85b7f9a3fc39f538d6f619a7a98a52cd6/resonate_sdk-0.4.8-py3-none-any.whl", hash = "sha256:fc1ac6d5c05d5d52ac572850ac23a5cfcfbb21b642cdf84d12c0862632da2ea7", size = 42404 },
 ]
 
 [[package]]
