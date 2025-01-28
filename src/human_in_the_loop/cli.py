@@ -1,5 +1,5 @@
 from typing import Any, Generator
-from resonate import DurablePromise, Promise, Resonate, Context
+from resonate import Promise, Resonate, Context
 from resonate.task_sources import Poller
 from typer import Typer
 from resonate.typing import Yieldable
@@ -30,7 +30,7 @@ def send_email(ctx: Context, promise_id: str, email: str) -> None:
 
 @resonate.register()
 def auth_handler(ctx: Context, email: str) -> Generator[Yieldable, Any, str]:
-    promise: Promise[Any] = yield ctx.rfi(DurablePromise())
+    promise: Promise[bool] = yield ctx.promise()
     yield ctx.lfc(send_email, promise.id, email)
     value: bool = yield promise
     if value:
