@@ -10,12 +10,14 @@ requires-python = ">=3.10"
 dependencies = [
     "fastapi[standard]>=0.115.7",
     "resonate-sdk>=0.4.8",
+    "salmon-mail>=3.3.0",
     "typer>=0.15.1",
 ]
 
 [project.scripts]
-human-in-the-loop = "human_in_the_loop.cli:main"
-auth-service = "human_in_the_loop.auth_service:main"
+hitl-auth = "human_in_the_loop.sender:main"
+hitl-auth-service = "human_in_the_loop.auth_service:main"
+hitl-listen = "human_in_the_loop.listener:main"
 
 [build-system]
 requires = ["hatchling"]
