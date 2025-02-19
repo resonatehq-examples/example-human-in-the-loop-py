@@ -23,9 +23,9 @@ def send_email(ctx: Context, promise_id: str, email: str) -> None:
 |You've received a new email {email}!                                                                       |
 |                                                                                                           |
 |Seems someone needs you to confirm your email before continue. To confirm                                  |
-|please click here: [http://127.0.0.1:8000/?promise_id={promise_id}&value=true]                             |
+|please click here: [ http://127.0.0.1:8000/?promise_id={promise_id}&approved=true ]                        |
 |                                                                                                           |
-|In case you want to not confirm, click here: [http://127.0.0.1:8000/?promise_id={promise_id}&value=false]  |
+|In case you want to not confirm, click here: [ http://127.0.0.1:8000/?promise_id={promise_id}&approved=false ]  |
 -------------------------------------------------------------------------------------------------------------
     """
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

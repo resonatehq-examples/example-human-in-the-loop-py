@@ -12,9 +12,9 @@ app = FastAPI()
 
 
 @app.get("/")
-def read_root(promise_id: str, value: bool):
+def read_root(promise_id: str, approved: bool):
     resonate_store.promises.resolve(
-        id=promise_id, ikey=None, strict=False, headers=None, data=json.dumps(value)
+        id=promise_id, ikey=None, strict=False, headers=None, data=json.dumps(approved)
     )
     return {"success": "We have received you response. Thanks!"}
 
