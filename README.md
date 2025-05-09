@@ -1,54 +1,37 @@
-# Dead Simple Human-in-the-Loop Workflows with [Resonate](https://github.com/resonatehq/resonate)
+# Human-In-The-Loop | Resonate example application
 
-This example application demonstrates how straightforward it is to implement business logic involving human judgment between executions. While such requirements are common and valuable, traditional implementations often face challenges: fragmented handlers reacting to unpredictable events, complex state management, and scalability constraints.
+This example showcases Resonate's ability to block a function execution's progress while awaiting on an action/input from a human.
 
-With Resonate, you write **procedural** code that pauses indefinitely while awaiting human input. This approach allows developers to express business logic for cloud-native environments as simply as writing their first scripts—no boilerplate, no distributed systems jargon, just clean code.
+## Project prerequisites
 
-Take an email-based approval system requiring human input that might take days, months, or even years. Here’s how it looks when deployed in a serverless environment:
+This example application uses [uv](https://docs.astral.sh/uv/) as the Python environment and package manager.
 
-```python
-@resonate.register()
-def auth_handler(ctx: Context, email: str) -> Generator[Yieldable, Any, str]:
-    promise: Promise[bool] = yield ctx.promise()
-    yield ctx.lfc(send_email, promise.id, email)
-    value: bool = yield promise
-    if value:
-        return "You’re authorized!"
-    return "Not authorized :("
+After cloning this repo, change directory into the root of the project and run the following command to install dependencies:
+
+```shell
+uv sync
 ```
 
-The workflow sends an email with **Approve** or **Reject** buttons, then waits indefinitely for a response. When the recipient clicks a button, execution resumes seamlessly. In a serverless environment, the initial Lambda instance shuts down once it can no longer make progress, and a fresh instance spins up the moment the user resolves the promise via the email action.
+This example application requires that a [Resonate Server](https://docs.resonatehq.io/get-started/server-quickstart) is running locally.
 
-## Running the demo
+## How to run the example
 
-### Application Architecture
+You will need 3 terminals to run this example, one for the HTTP Gateway, one for the Worker, and one to send a cURL request. This does not include the terminal where you might have started the Resonate Server.
 
-This example consists of three components:
+In _Terminal 1_, start the HTTP Gateway:
 
-- **Sender**: Initiates approval workflows
-- **Listener**: Monitors for promise resolutions
-- **Auth Service**: Web server handling promise resolution via API
-
-### Workflow Execution
-
-1. **Start Services**
-```bash
-# Terminal 1 - Start Listener
-uv run hitl-listen
-
-# Terminal 2 - Start Auth Service
-uv run hitl-auth-service
+```shell
+uv run gateway
 ```
-2. **Initiate Approval Workflow**
-```bash
-uv run hitl-auth <your-email@domain.com> # Creates a pending approval promise and sends email
+
+In _Terminal 2_, start the Worker:
+
+```shell
+uv run Worker
 ```
-3. Resolve Promise
-   - Check Listener terminal for resolution links:
-```bash
-APPROVE: http://localhost:8000/approve?pid=<PROMISE_ID>
-REJECT: http://localhost:8000/reject?pid=<PROMISE_ID>
+
+In _Terminal 3_, send the cURL request:
+
+```shell
+curl -X POST http://localhost:5001/start-workflow -H "Content-Type: application/json" -d '{"workflow_id": "hitl-001"}'
 ```
-   - Click either link to continue workflow execution
-4. **Observe Completion**
-   The Sender workflow resumes automatically after resolution, showing final authorization status.
