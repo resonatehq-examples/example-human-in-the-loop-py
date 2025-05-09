@@ -42,7 +42,7 @@ def unblock_workflow_route_handler():
     if not promise_id:
         return jsonify({"error": "promise_id is required"}), 400
     # resolve the promise
-    resonate.promises.resolve(id=promise_id)
+    resonate.promises.resolve(id=promise_id, ikey=promise_id)
     return jsonify({"message": "workflow unblocked"}), 200
 
 
