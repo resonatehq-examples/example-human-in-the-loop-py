@@ -27,7 +27,7 @@ uv run gateway
 In _Terminal 2_, start the Worker:
 
 ```shell
-uv run Worker
+uv run worker
 ```
 
 In _Terminal 3_, send the cURL request:
