@@ -92,7 +92,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "flask", specifier = ">=3.1.0" },
-    { name = "resonate-sdk", specifier = ">=0.5.0" },
+    { name = "resonate-sdk", specifier = "==0.5.1" },
 ]
 
 [package.metadata.requires-dev]
@@ -233,14 +233,14 @@ wheels = [
 
 [[package]]
 name = "resonate-sdk"
-version = "0.5.0"
+version = "0.5.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/72/8b/98f0bf9980e4ef420ff2c5fc5ac9d3191a49d254d0e323a60612f83ced40/resonate_sdk-0.5.0.tar.gz", hash = "sha256:a85a4dcf790ae25fed0c34dfaec942d99baf5e9d4949962ce590eeff8079b9e4", size = 63480 }
+sdist = { url = "https://files.pythonhosted.org/packages/7b/d7/d8b2513982832eaebe94449bd823b743c83268e479f2d2d93b26634706ad/resonate_sdk-0.5.1.tar.gz", hash = "sha256:62dd323c2f813af8e7b55266d3a98a15534bd18b5fccaa8cd9040aa3553a985d", size = 75615 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/40/7d/6fa109bce4d4c43e65b9e6433938f6ff4850ff57bf354cdd40be8884fb10/resonate_sdk-0.5.0-py3-none-any.whl", hash = "sha256:078e24437bbf905aaf04f323964922602dce25f206c889ba9ee6319026bdff6e", size = 50382 },
+    { url = "https://files.pythonhosted.org/packages/7d/3a/9f6a2a001639b10505d7e37a03e3760040e1c67aad14b41c5c261580476a/resonate_sdk-0.5.1-py3-none-any.whl", hash = "sha256:f79315619d4d830f642bcc7528b37d361de34ec210da1fec7fbb9fd93c6ab015", size = 55871 },
 ]
 
 [[package]]
