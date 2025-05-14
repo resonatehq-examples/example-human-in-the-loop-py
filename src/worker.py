@@ -1,4 +1,3 @@
-from resonate.message_sources.poller import Poller
 from resonate import Resonate
 from threading import Event
 
