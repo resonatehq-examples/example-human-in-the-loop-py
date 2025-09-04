@@ -9,7 +9,7 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "flask>=3.1.0",
-    "resonate-sdk==0.5.1"
+    "resonate-sdk>=0.6.3",
 ]
 
 [dependency-groups]

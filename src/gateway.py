@@ -16,7 +16,7 @@ def start_workflow_route_handler():
     data = request.get_json()
     if "workflow_id" not in data:
         return jsonify({"error": "workflow_id is required"}), 400
-    handle = resonate.options(target="poll://worker").rpc(data["workflow_id"], "foo", data["workflow_id"])
+    handle = resonate.options(target="poll://any@worker").begin_rpc(data["workflow_id"], "foo", data["workflow_id"])
     # check if the workflow is done
     if handle.done():
         # if the workflow is done, return the result
