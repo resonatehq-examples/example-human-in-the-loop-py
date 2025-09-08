@@ -1,54 +1,98 @@
-# Dead Simple Human-in-the-Loop Workflows with [Resonate](https://github.com/resonatehq/resonate)
+![human in the loop banner](/assets/human-in-the-loop.png)
 
-This example application demonstrates how straightforward it is to implement business logic involving human judgment between executions. While such requirements are common and valuable, traditional implementations often face challenges: fragmented handlers reacting to unpredictable events, complex state management, and scalability constraints.
+# Human-In-The-Loop
 
-With Resonate, you write **procedural** code that pauses indefinitely while awaiting human input. This approach allows developers to express business logic for cloud-native environments as simply as writing their first scripts—no boilerplate, no distributed systems jargon, just clean code.
+**Resonate Python SDK**
 
-Take an email-based approval system requiring human input that might take days, months, or even years. Here’s how it looks when deployed in a serverless environment:
+This example showcases Resonate's ability to block a function execution's progress while waiting for an action or input from a human.
+
+Instructions on [How to run this example](#how-to-run-the-example) are below.
+
+## Indefinite function suspension
+
+The Human-In-The-Loop example showcases how Resonate enables a function to suspend execution for an indefinite amount of time. That is, when the function yields a promise, it pauses execution and resumes only when the promise resolves.
 
 ```python
-@resonate.register()
-def auth_handler(ctx: Context, email: str) -> Generator[Yieldable, Any, str]:
-    promise: Promise[bool] = yield ctx.promise()
-    yield ctx.lfc(send_email, promise.id, email)
-    value: bool = yield promise
-    if value:
-        return "You’re authorized!"
-    return "Not authorized :("
+def foo(ctx, workflow_id):
+    blocking_promise = yield ctx.promise()
+    # ...
+    # wait for the promise to be resolved
+    yield blocking_promise
+    # ...
 ```
 
-The workflow sends an email with **Approve** or **Reject** buttons, then waits indefinitely for a response. When the recipient clicks a button, execution resumes seamlessly. In a serverless environment, the initial Lambda instance shuts down once it can no longer make progress, and a fresh instance spins up the moment the user resolves the promise via the email action.
+This enables a wide range of use cases where a function may depend on a human interaction or human input for it to continue.
 
-## Running the demo
+Use cases like this have traditionally been quite complex to solve, requiring the steps to be broken up and triggered by schedules or a queuing architecture.
 
-### Application Architecture
+Resonate pushes that complexity into the platform, enabling a much simpler developer experience for these use cases.
 
-This example consists of three components:
+## Deduplication
 
-- **Sender**: Initiates approval workflows
-- **Listener**: Monitors for promise resolutions
-- **Auth Service**: Web server handling promise resolution via API
+With Resonate, each function invocation pairs with a promise.
+Each promise has a unique ID in the system.
 
-### Workflow Execution
+The Resonate system deduplicates based on the promise ID and will either reconnect to a PENDING execution, or return the result of the RESOLVED promise.
 
-1. **Start Services**
-```bash
-# Terminal 1 - Start Listener
-uv run hitl-listen
+This example showcases how this works in the gateway:
 
-# Terminal 2 - Start Auth Service
-uv run hitl-auth-service
+```python
+@app.route("/start-workflow", methods=["POST"])
+def start_workflow_route_handler():
+    # invoke with the provided workflow id and get a handle to that promise
+    handle = resonate.options(target="poll://worker").rpc(data["workflow_id"], "foo", data["workflow_id"])
+    # check if the workflow is done
+    if handle.done():
+        # if the workflow is done, return the result
+        return jsonify({"message": handle.result()})
+    # if the workflow is not done yet, return a message that the workflow started
+    return jsonify({"message": f"workflow {data['workflow_id']} started"}), 200
 ```
-2. **Initiate Approval Workflow**
-```bash
-uv run hitl-auth <your-email@domain.com> # Creates a pending approval promise and sends email
+
+## Load balancing and recovery
+
+This example is capable of showcasing Resonate's automatic load balancing and recovery.
+
+Run multiple workers and start multiple workflows.
+You will eventually see each worker start executing a workflow.
+
+Try killing one of the workers while the workflow is blocked and watch it recover on the other worker.
+
+## How to run the example
+
+This example application uses [uv](https://docs.astral.sh/uv/) as the Python environment and package manager.
+
+After cloning this repo, change directory into the root of the project and run the following command to install dependencies:
+
+```shell
+uv sync
 ```
-3. Resolve Promise
-   - Check Listener terminal for resolution links:
-```bash
-APPROVE: http://localhost:8000/approve?pid=<PROMISE_ID>
-REJECT: http://localhost:8000/reject?pid=<PROMISE_ID>
+
+This example application requires that a Resonate Server is running locally.
+
+```shell
+brew install resonatehq/tap/resonate
+resonate serve
 ```
-   - Click either link to continue workflow execution
-4. **Observe Completion**
-   The Sender workflow resumes automatically after resolution, showing final authorization status.
+
+You will need 3 terminals to run this example, one for the HTTP Gateway, one for the Worker, and one to send a cURL request. This does not include the terminal where you might have started the Resonate Server.
+
+In _Terminal 1_, start the HTTP Gateway:
+
+```shell
+uv run gateway
+```
+
+In _Terminal 2_, start the Worker:
+
+```shell
+uv run worker
+```
+
+In _Terminal 3_, send the cURL request to start the workflow:
+
+```shell
+curl -X POST http://localhost:5001/start-workflow -H "Content-Type: application/json" -d '{"workflow_id": "hitl-001"}'
+```
+
+The worker will print a link that you can navigate to in your browser, which sends another request to the gateway, resolving the blocking promise and allowing the workflow to complete.
