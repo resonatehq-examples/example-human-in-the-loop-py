@@ -22,15 +22,20 @@ Instructions on [How to run this example](#how-to-run-the-example) are below.
 
 ## Indefinite function suspension
 
-The Human-In-The-Loop example showcases how Resonate enables a function to suspend execution for an indefinite amount of time. That is, when the function yields a promise, it pauses execution and resumes only when the promise resolves.
+The Human-In-The-Loop example showcases how Resonate enables a function to suspend execution for an indefinite amount of time. When the workflow calls `ctx.promise()` and then `await`s the resulting future, execution pauses and resumes only when an external caller resolves the promise.
 
 ```python
-def foo(ctx, workflow_id):
-    blocking_promise = yield ctx.promise()
-    # ...
-    # wait for the promise to be resolved
-    yield blocking_promise
-    # ...
+async def foo(ctx: Context, workflow_id: str) -> dict[str, str]:
+    blocking_promise = ctx.promise()
+    promise_id = await blocking_promise.id()
+
+    # Notify the reviewer with the promise id they must resolve
+    await ctx.run(send_email, promise_id)
+
+    # Suspend until the external party resolves the promise
+    await blocking_promise
+
+    return {"message": f"workflow {workflow_id} completed"}
 ```
 
 This enables a wide range of use cases where a function may depend on a human interaction or human input for it to continue.
@@ -49,16 +54,13 @@ The Resonate system deduplicates based on the promise ID and will either reconne
 This example showcases how this works in the gateway:
 
 ```python
-@app.route("/start-workflow", methods=["POST"])
-def start_workflow_route_handler():
-    # invoke with the provided workflow id and get a handle to that promise
-    handle = resonate.options(target="poll://worker").rpc(data["workflow_id"], "foo", data["workflow_id"])
-    # check if the workflow is done
-    if handle.done():
-        # if the workflow is done, return the result
-        return jsonify({"message": handle.result()})
-    # if the workflow is not done yet, return a message that the workflow started
-    return jsonify({"message": f"workflow {data['workflow_id']} started"}), 200
+@app.post("/start-workflow")
+async def start_workflow(request: Request) -> dict[str, Any]:
+    data = await request.json()
+    workflow_id = data["workflow_id"]
+    # Fire and forget — Resonate deduplicates on workflow_id
+    _resonate.run(workflow_id, foo, workflow_id)
+    return {"message": f"workflow {workflow_id} started"}
 ```
 
 ## Load balancing and recovery
